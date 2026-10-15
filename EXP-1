@@ -1,0 +1,55 @@
+from heapq import heappush, heappop
+
+goal = (1, 2, 3, 4, 5, 6, 7, 8, 0)
+
+def heuristic(state):
+    return sum(
+        1 for i, n in enumerate(state)
+        if n != 0 and n != goal[i]
+    )
+
+def solve(start):
+    pq = [(heuristic(start), 0, start, [])]
+    visited = set()
+
+    while pq:
+        f, g, state, path = heappop(pq)
+
+        if state in visited:
+            continue
+        visited.add(state)
+        path = path + [state]
+
+        if state == goal:
+            for s in path:
+                for i in range(0, 9, 3):
+                    print(s[i:i+3])
+                print()
+            return
+
+        z = state.index(0)
+        r, c = divmod(z, 3)
+
+        for dr, dc in [(1, 0), (-1, 0),
+                       (0, 1), (0, -1)]:
+            nr, nc = r + dr, c + dc
+
+            if 0 <= nr < 3 and 0 <= nc < 3:
+                nz = nr * 3 + nc
+                a = list(state)
+                a[z], a[nz] = a[nz], a[z]
+                nxt = tuple(a)
+
+                if nxt not in visited:
+                    heappush(pq, (
+                        g + 1 + heuristic(nxt),
+                        g + 1, nxt, path
+                    ))
+
+    print("No solution found")
+
+start = tuple(map(int, input(
+    "Enter 9 numbers (use 0 for blank): "
+).split()))
+
+solve(start)
