@@ -1,0 +1,42 @@
+from collections import deque
+from math import gcd
+
+def water_jug(a, b, target):
+    if target > max(a, b) or target % gcd(a, b) != 0:
+        print("Solution not possible")
+        return
+
+    q = deque([(0, 0, [])])
+    visited = set()
+
+    while q:
+        x, y, path = q.popleft()
+
+        if (x, y) in visited:
+            continue
+
+        visited.add((x, y))
+        path = path + [(x, y)]
+
+        if x == target or y == target:
+            for step in path:
+                print(step)
+            return
+
+        states = [
+            (a, y), (x, b), (0, y), (x, 0),
+            (x - min(x, b-y), y + min(x, b-y)),
+            (x + min(y, a-x), y - min(y, a-x))
+        ]
+
+        for state in states:
+            if state not in visited:
+                q.append((*state, path))
+
+    print("Solution not found")
+
+a = int(input("Enter capacity of jug 1: "))
+b = int(input("Enter capacity of jug 2: "))
+target = int(input("Enter target amount: "))
+
+water_jug(a, b, target)
